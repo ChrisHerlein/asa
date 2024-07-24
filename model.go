@@ -1,6 +1,9 @@
 package main
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"strconv"
+)
 
 type RFactorXML struct {
 	XMLName     xml.Name    `xml:"rFactorXML"`
