@@ -17,7 +17,7 @@ func readResult(fname string) (*RFactorXML, error) {
 	return sortDrivers(&resultFile), xml.Unmarshal(data, &resultFile)
 }
 
-func sortDrivers(rf *RFactorXML) *RFactorXML {
+func sortDrivers(rf *RFactorXML) []AsaDriver {
 	var drivers = make([]Driver, len(rf.RaceResults.Qualify.Drivers))
 	for i := 0; i < len(rf.RaceResults.Qualify.Drivers); i++ {
 		pos, _ := strconv.Atoi(rf.RaceResults.Qualify.Drivers[i].Position)
