@@ -4,40 +4,43 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"strconv"
 )
 
-func readResult(fname string) (*RFactorXML, error) {
+func readResult(fname string) ([]AsaDriver, error) {
 	data, err := os.ReadFile(fname)
 	if err != nil {
 		return nil, err
 	}
 
 	var resultFile RFactorXML
+	fmt.Printf("Data: %+v\n", string(data))
 	return sortDrivers(&resultFile), xml.Unmarshal(data, &resultFile)
 }
 
 func sortDrivers(rf *RFactorXML) []AsaDriver {
-	var drivers = make([]Driver, len(rf.RaceResults.Qualify.Drivers))
-	for i := 0; i < len(rf.RaceResults.Qualify.Drivers); i++ {
-		pos, _ := strconv.Atoi(rf.RaceResults.Qualify.Drivers[i].Position)
-		drivers[pos-1] = rf.RaceResults.Qualify.Drivers[i]
-	}
-	rf.RaceResults.Qualify.Drivers = drivers
-
-	var driversR = make([]Driver, len(rf.RaceResults.Race.Drivers))
-	for i := 0; i < len(rf.RaceResults.Race.Drivers); i++ {
-		pos, _ := strconv.Atoi(rf.RaceResults.Race.Drivers[i].Position)
-		driversR[pos-1] = rf.RaceResults.Race.Drivers[i]
-	}
-	rf.RaceResults.Race.Drivers = driversR
-
-	if len(driversR) > 0 {
-		ln, _ := strconv.ParseFloat(driversR[0].FinishTime, 64)
-		rf.RaceResults.Race.Length = ln
+	var drivers []AsaDriver
+	// if qualy
+	fmt.Printf("File: %+v\n", rf)
+	fmt.Println("lq", len(rf.RaceResults.Qualify.Drivers))
+	if len(rf.RaceResults.Qualify.Drivers) > 0 {
+		fmt.Println("is qualy")
+		rf = removeExtraLaps(rf)
+		for _, d := range rf.RaceResults.Qualify.Drivers {
+			drivers = append(drivers, *d.toAsa())
+		}
+		fmt.Println("Sorted drivers:", len(drivers))
 	}
 
-	return rf
+	// if race
+	if len(rf.RaceResults.Race.Drivers) > 0 {
+		for _, d := range rf.RaceResults.Race.Drivers {
+			drivers = append(drivers, *d.toAsa())
+		}
+	}
+
+	ADClearDNS(drivers)
+	ADSort(drivers)
+	return drivers
 }
 
 const resultsPath = "./UserData/LOG/Results"

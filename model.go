@@ -26,7 +26,7 @@ type AsaDriver struct {
 	FinishStatus string
 }
 
-func ADSort(ad []*AsaDriver) {
+func ADSort(ad []AsaDriver) {
 	for i := 0; i < len(ad); i++ {
 		for j := 0; j < len(ad)-1; j++ {
 			if ad[j].Position > ad[j+1].Position {
@@ -38,8 +38,8 @@ func ADSort(ad []*AsaDriver) {
 	}
 }
 
-func ADClearDNS(ad []*AsaDriver) []*AsaDriver {
-	var clean = make([]*AsaDriver, 0)
+func ADClearDNS(ad []AsaDriver) []AsaDriver {
+	var clean = make([]AsaDriver, 0)
 	for i := 0; i < len(ad); i++ {
 		if ad[i].Laps > 0 {
 			clean = append(clean, ad[i])

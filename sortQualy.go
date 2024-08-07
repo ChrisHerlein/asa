@@ -31,15 +31,15 @@ func removeExtraLaps(results *RFactorXML) *RFactorXML {
 	return results
 }
 
-func removeInvalidPole(results *RFactorXML) *RFactorXML {
+func removeInvalidPole(original []AsaDriver) []AsaDriver {
 	for i := 0; i < poleExclude; i++ {
-		poleSitter := results.RaceResults.Qualify.Drivers[0]
-		drivers := make([]Driver, len(results.RaceResults.Qualify.Drivers))
-		for j := 1; j < len(results.RaceResults.Qualify.Drivers); j++ {
-			drivers[j-1] = results.RaceResults.Qualify.Drivers[j]
+		poleSitter := original[0]
+		drivers := make([]AsaDriver, len(original))
+		for j := 1; j < len(original); j++ {
+			drivers[j-1] = original[j]
 		}
-		drivers[len(results.RaceResults.Qualify.Drivers)-1] = poleSitter
-		results.RaceResults.Qualify.Drivers = drivers
+		drivers[len(original)-1] = poleSitter
+		original = drivers
 	}
-	return results
+	return original
 }

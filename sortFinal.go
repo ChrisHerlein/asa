@@ -1,14 +1,14 @@
 package main
 
-func chooseFasterSerie(pos int, series ...*RFactorXML) *RFactorXML {
-	fasterTime := make([]string, len(series))
+func chooseFasterSerie(pos int, series ...[]AsaDriver) []AsaDriver {
+	fasterTime := make([]float64, len(series))
 	fromSerie := make([]int, len(series))
 
 	for i := 0; i < len(series); i++ {
 	JLoop:
-		for j := 0; j < len(series[i].RaceResults.Race.Drivers); j++ {
-			if series[i].RaceResults.Race.Drivers[j].Position == "1" {
-				fasterTime[i] = series[i].RaceResults.Race.Drivers[j].FinishTime
+		for j := 0; j < len(series[i]); j++ {
+			if series[i][j].Position == 1 {
+				fasterTime[i] = series[i][j].FinishTime
 				fromSerie[i] = i
 				break JLoop
 			}

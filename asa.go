@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -73,27 +72,29 @@ func setFinal() error {
 	return sortFinal(s1, s2)
 }
 
-func sortFinal(s1, s2 *RFactorXML) error {
+func sortFinal(series ...[]AsaDriver) error {
+	// merge series
+	var drivers = make([]AsaDriver, 0)
+
+	var maxDrivers int
+	for i := 0; i < len(series); i++ {
+		if len(series[i]) > maxDrivers {
+			maxDrivers = len(series[i])
+		}
+	}
+
+	for i := 0; i <= maxDrivers*len(series); i++ {
+		idx := i % len(series)
+		if len(series[idx]) > i/len(series) {
+			drivers = append(drivers, series[idx][i/len(series)])
+		}
+	}
+
 	var lines = make([]string, 0)
 	lines = append(lines, "/racelength 1 12")
 
-	for i := 0; i < len(s1.RaceResults.Race.Drivers); i++ {
-		if s1.RaceResults.Race.Drivers[i].FinishStatus == "None" {
-			continue
-		}
-		driverPosStr := s1.RaceResults.Race.Drivers[i].Position
-		driverPos, _ := strconv.Atoi(driverPosStr)
-		line := fmt.Sprintf("/editgrid %d %s", driverPos*2-1, s1.RaceResults.Race.Drivers[i].Name)
-		lines = append(lines, line)
-	}
-
-	for i := 0; i < len(s2.RaceResults.Race.Drivers); i++ {
-		if s2.RaceResults.Race.Drivers[i].FinishStatus == "None" {
-			continue
-		}
-		driverPosStr := s2.RaceResults.Race.Drivers[i].Position
-		driverPos, _ := strconv.Atoi(driverPosStr)
-		line := fmt.Sprintf("/editgrid %d %s", driverPos*2, s2.RaceResults.Race.Drivers[i].Name)
+	for pos, d := range drivers {
+		line := fmt.Sprintf("/editgrid %d %s", pos+1, d.Name)
 		lines = append(lines, line)
 	}
 
@@ -115,7 +116,6 @@ func setSeries() error {
 		return err
 	}
 
-	qualy = removeExtraLaps(qualy)
 	qualy = removeInvalidPole(qualy)
 
 	err = sortSerie(1, qualy)
@@ -131,14 +131,14 @@ func setSeries() error {
 	return nil
 }
 
-func sortSerie(sn int, q *RFactorXML) error {
+func sortSerie(sn int, drivers []AsaDriver) error {
 	var lines = make([]string, 0)
 	lines = append(lines, "/racelength 1 5")
 	var sidx = sn - 1
 
 	var pos = 1
-	for i := sidx; i < len(q.RaceResults.Qualify.Drivers); i = i + 2 {
-		line := fmt.Sprintf("/editgrid %d %s", pos, q.RaceResults.Qualify.Drivers[i].Name)
+	for i := sidx; i < len(drivers); i = i + 2 {
+		line := fmt.Sprintf("/editgrid %d %s", pos, drivers[i].Name)
 		lines = append(lines, line)
 		pos++
 	}

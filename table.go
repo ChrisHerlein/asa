@@ -12,23 +12,22 @@ func setResultTable() error {
 		return err
 	}
 
-	race, err := readResult(raceFile)
+	drivers, err := readResult(raceFile)
 	if err != nil {
 		return err
 	}
 
-	if len(race.RaceResults.Race.Drivers) == 0 {
+	if len(drivers) == 0 {
 		return fmt.Errorf("is not a race")
 	}
 
-	drivers := rfDriversToAsa(race.RaceResults.Race.Drivers)
 	drivers = ADClearDNS(drivers)
 	ADSort(drivers)
 
 	return resultToCsv(drivers)
 }
 
-func resultToCsv(drivers []*AsaDriver) error {
+func resultToCsv(drivers []AsaDriver) error {
 	var lines = make([]string, 0)
 	lines = append(lines, "Position,Name,Laps,FinishTime,FinishStatus")
 	for _, driver := range drivers {
