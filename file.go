@@ -13,22 +13,18 @@ func readResult(fname string) ([]AsaDriver, error) {
 	}
 
 	var resultFile RFactorXML
-	fmt.Printf("Data: %+v\n", string(data))
-	return sortDrivers(&resultFile), xml.Unmarshal(data, &resultFile)
+	err = xml.Unmarshal(data, &resultFile)
+	return sortDrivers(&resultFile), err
 }
 
 func sortDrivers(rf *RFactorXML) []AsaDriver {
 	var drivers []AsaDriver
 	// if qualy
-	fmt.Printf("File: %+v\n", rf)
-	fmt.Println("lq", len(rf.RaceResults.Qualify.Drivers))
 	if len(rf.RaceResults.Qualify.Drivers) > 0 {
-		fmt.Println("is qualy")
 		rf = removeExtraLaps(rf)
 		for _, d := range rf.RaceResults.Qualify.Drivers {
 			drivers = append(drivers, *d.toAsa())
 		}
-		fmt.Println("Sorted drivers:", len(drivers))
 	}
 
 	// if race
@@ -38,8 +34,9 @@ func sortDrivers(rf *RFactorXML) []AsaDriver {
 		}
 	}
 
-	ADClearDNS(drivers)
+	drivers = ADClearDNS(drivers)
 	ADSort(drivers)
+
 	return drivers
 }
 
