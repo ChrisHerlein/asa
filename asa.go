@@ -9,14 +9,16 @@ import (
 )
 
 var action string
+var resultName string
 var poleExclude int
 
 func main() {
 	flag.StringVar(&action, "action", "", "series to sort qualy into series, final to sort series into final")
+	flag.StringVar(&resultName, "resultName", "", "name for result file to be writen")
 	flag.IntVar(&poleExclude, "exclude", 0, "amount of polemen to exclude by invalid lap")
 	flag.Parse()
 
-	if action != "series" && action != "final" {
+	if action != "series" && action != "final" && action != "result" {
 		fmt.Println("Invalid action:", action)
 		os.Exit(2)
 	}
@@ -32,6 +34,12 @@ func main() {
 		err := setFinal()
 		if err != nil {
 			fmt.Println("Error generating final:", err)
+			os.Exit(2)
+		}
+	case "result":
+		err := setResultTable()
+		if err != nil {
+			fmt.Println("Error generating table:", err)
 			os.Exit(2)
 		}
 	}
@@ -140,4 +148,12 @@ func sortSerie(sn int, q *RFactorXML) error {
 		[]byte(strings.Join(lines, "\n")),
 		0644,
 	)
+}
+
+func rfDriversToAsa(ds []Driver) []*AsaDriver {
+	drivers := make([]*AsaDriver, len(ds))
+	for i := 0; i < len(ds); i++ {
+		drivers[i] = ds[i].toAsa()
+	}
+	return drivers
 }
