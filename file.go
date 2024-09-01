@@ -25,6 +25,7 @@ func sortDrivers(rf *RFactorXML) []AsaDriver {
 		for _, d := range rf.RaceResults.Qualify.Drivers {
 			drivers = append(drivers, *d.toAsa())
 		}
+		ADQualySort(drivers)
 	}
 
 	// if race

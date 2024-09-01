@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func removeExtraLaps(results *RFactorXML) *RFactorXML {
 	for i := 0; i < len(results.RaceResults.Qualify.Drivers); i++ {
 		d := results.RaceResults.Qualify.Drivers[i]
@@ -10,22 +8,17 @@ func removeExtraLaps(results *RFactorXML) *RFactorXML {
 		}
 	}
 
-	sorted := false
-	for i := 0; i < len(results.RaceResults.Qualify.Drivers) && !sorted; i++ {
-		sorted = true
-		for j := i; j < len(results.RaceResults.Qualify.Drivers)-1; j++ {
-			if results.RaceResults.Qualify.Drivers[j].BestLapTime > results.RaceResults.Qualify.Drivers[j+1].BestLapTime &&
-				results.RaceResults.Qualify.Drivers[j].BestLapTime != "" && results.RaceResults.Qualify.Drivers[j+1].BestLapTime != "" {
-				sorted = false
-				aux := results.RaceResults.Qualify.Drivers[j]
-				results.RaceResults.Qualify.Drivers[j] = results.RaceResults.Qualify.Drivers[j+1]
-				results.RaceResults.Qualify.Drivers[j+1] = aux
-			}
-		}
-	}
-
+	// ,pver todos los bestLapTime == 0 al fondo
 	for i := 0; i < len(results.RaceResults.Qualify.Drivers); i++ {
-		results.RaceResults.Qualify.Drivers[i].Position = fmt.Sprintf("%d", i+1)
+		if results.RaceResults.Qualify.Drivers[i].BestLapTime == "" ||
+			results.RaceResults.Qualify.Drivers[i].BestLapTime == "--.----" {
+			driver := results.RaceResults.Qualify.Drivers[i]
+			driver.BestLapTime = "999.9999"
+			for j := i + 1; j < len(results.RaceResults.Qualify.Drivers); j++ {
+				results.RaceResults.Qualify.Drivers[j-1] = results.RaceResults.Qualify.Drivers[j]
+			}
+			results.RaceResults.Qualify.Drivers[len(results.RaceResults.Qualify.Drivers)-1] = driver
+		}
 	}
 
 	return results

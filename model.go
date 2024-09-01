@@ -22,6 +22,7 @@ type AsaDriver struct {
 	Name         string
 	Laps         int
 	Position     int
+	QualyTime    float64
 	FinishTime   float64
 	FinishStatus string
 }
@@ -38,6 +39,21 @@ func ADSort(ad []AsaDriver) {
 	}
 }
 
+func ADQualySort(ad []AsaDriver) {
+	for i := 0; i < len(ad); i++ {
+		for j := 0; j < len(ad)-1; j++ {
+			if ad[j].QualyTime > ad[j+1].QualyTime {
+				aux := ad[j]
+				ad[j] = ad[j+1]
+				ad[j+1] = aux
+			}
+		}
+	}
+	for i := 0; i < len(ad); i++ {
+		ad[i].Position = i + 1
+	}
+}
+
 func ADClearDNS(ad []AsaDriver) []AsaDriver {
 	var clean = make([]AsaDriver, 0)
 	for i := 0; i < len(ad); i++ {
@@ -51,11 +67,13 @@ func ADClearDNS(ad []AsaDriver) []AsaDriver {
 func (d *Driver) toAsa() *AsaDriver {
 	laps, _ := strconv.Atoi(d.Laps)
 	finishTime, _ := strconv.ParseFloat(d.FinishTime, 64)
+	qualyTime, _ := strconv.ParseFloat(d.BestLapTime, 64)
 	pos, _ := strconv.Atoi(d.Position)
 	return &AsaDriver{
 		Name:         d.Name,
 		Laps:         laps,
 		Position:     pos,
+		QualyTime:    qualyTime,
 		FinishTime:   finishTime,
 		FinishStatus: d.FinishStatus,
 	}
