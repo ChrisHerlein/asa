@@ -68,6 +68,9 @@ func (d *Driver) toAsa() *AsaDriver {
 	laps, _ := strconv.Atoi(d.Laps)
 	finishTime, _ := strconv.ParseFloat(d.FinishTime, 64)
 	qualyTime, _ := strconv.ParseFloat(d.BestLapTime, 64)
+	if qualyTime == 0 {
+		qualyTime = 9999
+	}
 	pos, _ := strconv.Atoi(d.Position)
 	return &AsaDriver{
 		Name:         d.Name,
